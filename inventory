@@ -1,0 +1,9 @@
+[myself]
+localhost
+[web]
+servera.local
+serverb.local
+[web1]
+servera.local
+[web2]
+serverb.local
