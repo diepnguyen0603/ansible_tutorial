@@ -1,0 +1,19 @@
+---
+- name: Remove a Apache and PHP LIB
+  hosts: web1
+  become: true                          # sudo
+  tasks:
+  
+  - name: update repository index
+    yum:
+      update_cache: yes
+
+  - name: Remove apache2 package
+    yum:
+      name: httpd
+      state: absent
+      
+  - name: Remove PHP support for HTTPD
+    yum:
+      name: php
+      state: absent

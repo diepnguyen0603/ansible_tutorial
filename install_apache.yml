@@ -1,0 +1,26 @@
+---
+- name: Install a Apache
+  hosts: web1
+  become: true                          # sudo
+  tasks:
+  
+  - name: update repository index
+    yum:
+      update_cache: yes
+
+  - name: Install apache2 package
+    yum:
+      name: httpd
+      state: latest
+      
+  - name: Add PHP support for HTTPD
+    yum:
+      name: php
+      state: latest
+      
+  - name: Enable and start Apache2
+    service:
+      name: httpd
+      enabled: true
+      state: started
+
