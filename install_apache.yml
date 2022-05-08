@@ -1,35 +1,27 @@
 ---
 - name: Install a Apache
-  hosts: web3
+  hosts: web3, web1
   gather_facts: yes
   # become: true                          # sudo
   tasks:
   
-  - name: update DEBIAN repository index
-    apt:
-      update_cache: yes
-    when: ansible_distribution in ["Ubuntu","Debian"]
-    
-  - name: Install apache2 and php packages for Ubuntu/Debian
+  - name: Update_Cache - Install apache2 and php packages for Ubuntu/Debian
     apt:
       name:
         - apache2
         - libapache2-mod-php
       state: latest
+      update_cache: yes
     when: ansible_distribution in ["Ubuntu", "Debian"]
 
 
-  - name: update AlmaLinux repository index
-    dnf:
-      update_cache: yes
-    when: ansible_distribution in ["AlmaLinux"]
-  
-  - name: Install httpd and php package
+  - name: Update_Cache - Install httpd and php packages for RHEL-Distribution
     dnf:
       name:
         - httpd
         - php
       state: latest
+      update_cache: yes
     when: ansible_distribution == "AlmaLinux"
       
   - name: Enable and start httpd because it doesnt start automatically
