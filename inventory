@@ -3,7 +3,10 @@ localhost
 [web]
 servera.local
 serverb.local
+secure01.local
 [web1]
 servera.local
 [web2]
 serverb.local
+[web3]
+secure01.local
