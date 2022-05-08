@@ -6,12 +6,14 @@
   pre_tasks:                              # This task must run first!!!
 
   - name: Install updates (RHEL) FIRST
+    tags: always
     dnf:
       update_only: yes
       update_cache: yes
     when: ansible_distribution == ["AlmaLinux"]
 
   - name: Install Updates (Debian) FIRST
+    tags: always
     apt:
       upgrade: dist
       update_cache: yes
@@ -24,6 +26,7 @@
   tasks:
 
   - name: Install apache2 and mod-php packages for Ubuntu/Debian
+    tags: apache,apache2,debian
     apt:
       name:
         - apache2
@@ -33,6 +36,7 @@
 
 
   - name: Install httpd and php packages for RHEL-Distribution
+    tags: apache,centos,httpd
     dnf:
       name:
         - httpd
@@ -53,12 +57,14 @@
   tasks:
   
   - name: Install mariadb package (RHEL)
+    tags: centos,db,mariadb
     dnf:
       name: mariadb
       state: latest
     when: ansible_distribution == "AlmaLinux"
 
-  - name: Install mariadb package (Debian)
+  - name: Install mariadb package (Debian) 
+    tags: db, mariadb,ubuntu
     apt:
       name: mariadb-server
       state: latest
@@ -70,6 +76,7 @@
   tasks:
   
   - name: Install samba package, same name for RHEL and Debian
+    tags: samba
     package:          # Modul: package (samba has same name for RHEL + Debian)
       name: samba
       state: latest
