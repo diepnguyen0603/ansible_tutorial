@@ -70,6 +70,14 @@
       state: latest
     when: ansible_distribution == "Debian"
 
+  - name: copy default html file for website
+    tags: apache,apache2,httpd
+    copy:
+      src: default_site.html            # in /files/default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
 
 - name: next Play No. 4
   hosts: file_servers
