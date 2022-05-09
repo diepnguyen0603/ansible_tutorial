@@ -1,3 +1,6 @@
+[myself]
+workstation.local
+
 [web_servers]
 servera.local
 serverb.local
