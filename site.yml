@@ -21,6 +21,32 @@
 
 
 
+
+
+# Add new play only in workstation
+- name: Install unzip and terraform in workstation.local
+  hosts: myself
+  gather_facts: yes
+  tasks:
+    
+  - name: install unzip
+    package:
+      name: unzip
+
+  - name: getting terraform link from website
+    unarchive:              # module that allows to unzip the zipped file
+      src: https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes       # the archive file already on remote system!
+      mode: 0755
+      owner: root
+      group: root
+
+
+
+
+
+# --------------------------------------------------------------------------------------
 - name: Install the Packages
   hosts: web_servers
   tasks:
@@ -51,6 +77,14 @@
       state: started
     when: ansible_distribution == "AlmaLinux"
 
+  - name: copy default html file for website
+    tags: apache,apache2,httpd
+    copy:
+      src: default_site.html            # in /files/default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
 
 - name: next Play No. 3
   hosts: db_servers
@@ -70,14 +104,6 @@
       state: latest
     when: ansible_distribution == "Debian"
 
-  - name: copy default html file for website
-    tags: apache,apache2,httpd
-    copy:
-      src: default_site.html            # in /files/default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
 
 - name: next Play No. 4
   hosts: file_servers
