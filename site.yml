@@ -5,21 +5,32 @@
   # become: true                          # sudo
   pre_tasks:                              # This task must run first!!!
 
-  - name: Install updates (RHEL) FIRST
+  - name: update repo cache (RHEL)
     tags: always
     dnf:
-      update_only: yes
       update_cache: yes
+    changed_when: false                   # when update_cache doesnt worke, we see why!
     when: ansible_distribution == ["AlmaLinux"]
 
-  - name: Install Updates (Debian) FIRST
+  - name: update repo cache (Debian)
     tags: always
     apt:
-      upgrade: dist
       update_cache: yes
+    changed_when: false
     when: ansible_distribution in ["Ubuntu", "Debian"]
 
+# ------------------------------------------------------------------------------
+ 
+- name: Create ssh key for an User
+  hosts: all
+  gather_facts: yes
+  tasks:
 
+  - name: add ssh key for simone
+    tags: always
+    authorized_key:
+      user: simone            # key-Schlüssel hier aus ~/..ssh/id_rsa.pub vom User:"devops"
+      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXoxvBe7+KUSTgCVSvol4UEKknk9dfY5NYdF9+6PcXPa1BbFjxw4QsHVVlxdTFPmpRTVKcryaC+pl2J7V9oFm8b1REhGjGq7YFK5Uu99iLfQGL4sBFOfMoy4Xg3j1Qr6ZvZo645EPOYvV6BUCEMOFAky7r1OFbNO9QTBcJkfAni1kU8tOWPk/4jxD3qOHIJ3Mhibg8c3HUmq1/Czq6BcA/gzalbwzzlesmdJPCy3yqy2p1H1t34sBIZW6OjB9xE+m/hmtAmi7YvzD7lN3SFyzww3k/lIjcNBSkYnElr1mk3oX6ajyKlZ9HSkHHURttmHl8I+y0aksv87kdaHKvC72jm+asz4l13wL/QK3CZcMJglVm1TWcdeP5epvTuvNn7JgeouzAz4+H4GN4blwyzzUhtx+2xoJPMjxQpZypA6HBPc4vXdMZusYLfTj4LaFc08Jxc2zlgoh86s7QpnDtQCjxbQ5nwCpMByfzu5ngS5cGaLgguTA35QseRfh4GXEAwAoYteeg8/aCBX0t3//8VDxnqnmw2EcgQBiusC/OvlsHeteVVpfZVwTjBjTcImSNW9x359ZyfCEFABuPDSrns6YxOLqQQdce/gI279+6EoueC+2WcpafflhbBqum3EFHN3urL8W7j3nc+eWvt6fTDpMENlu9a/9SaLEFOKZBuEv8oQ== devops@workstation.local"
 
 
 
