@@ -1,0 +1,51 @@
+- name: Install apache2 and mod-php packages for Ubuntu/Debian
+  tags: apache,apache2,debian
+  apt:
+    name:
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution in ["Ubuntu", "Debian"]
+
+
+- name: Install httpd and php packages for RHEL-Distribution
+  tags: apache,centos,httpd
+  dnf:
+    name:
+      - httpd
+      - php
+    state: latest
+  when: ansible_distribution == "AlmaLinux"
+    
+- name: Enable and start httpd (RHEL and CentOS) because it doesnt start automatically
+  tags: apache,centos,httpd
+  service:
+    name: httpd
+    enabled: true
+    state: started
+  when: ansible_distribution == "AlmaLinux"
+
+- name: change e-mail address for admin
+  tags: apache,centos,httpd
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^ServerAdmin'
+    line: ServerAdmin my.email@somewhere.org
+  when: ansible_distribution == "AlmaLinux"
+  register: httpd                     # Name freiwählbar; hier: httpd als Variable
+
+- name: restart Service only, when changed in httpd
+  tags: apache,centos,httpd
+  service:
+    name: httpd
+    state: restarted
+  when: httpd.changed                 # nur wenn in ..htttpd.conf geändert wurde
+
+- name: copy default html file for website
+  tags: apache,apache2,httpd
+  copy:
+    src: default_site.html            # in /files/default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
