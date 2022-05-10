@@ -1,0 +1,39 @@
+- name: Install apache and php packages
+  tags: apache,httpd,php
+  package:
+    name:
+      - "{{ apache_package }}"
+      - "{{ php_package }}"
+    state: latest
+
+- name: Start and enable apache service
+  tags: apache,httpd
+  service:
+    name: "{{ apache_service }}"
+    enabled: true
+    state: started
+
+- name: change e-mail address for admin
+  tags: apache,centos,httpd
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^ServerAdmin'
+    line: ServerAdmin my.email@somewhere.org
+  when: ansible_distribution == "AlmaLinux"
+  register: apache                    # Name freiwählbar; hier: apache als Variable
+
+- name: restart httpd
+  tags: apache,httpd
+  service:
+    name: "{{ apache_service }}"
+    state: restarted
+  when: apache.changed                 # nur wenn in ..htttpd.conf geändert wurde
+
+- name: copy default html file for website
+  tags: apache,apache2,httpd
+  copy:
+    src: default_site.html            # in /files/default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
