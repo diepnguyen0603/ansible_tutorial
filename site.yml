@@ -1,5 +1,5 @@
 ---
-- name: Update the server
+- name: Update the repo cache 
   hosts: all
   gather_facts: yes
   # become: true                          # sudo
@@ -9,7 +9,7 @@
     tags: always
     dnf:
       update_cache: yes
-    changed_when: false                   # when update_cache doesnt worke, we see why!
+    changed_when: false                   # when update_cache doesnt work, we see why!
     when: ansible_distribution == ["AlmaLinux"]
 
   - name: update repo cache (Debian)
@@ -20,126 +20,30 @@
     when: ansible_distribution in ["Ubuntu", "Debian"]
 
 # ------------------------------------------------------------------------------
- 
-- name: Create ssh key for an User
+# roles beginning
+#
+- name: --- Roles base ---
   hosts: all
-  gather_facts: yes
-  tasks:
+  roles:
+    - base
 
-  - name: add ssh key for simone
-    tags: always
-    authorized_key:
-      user: simone            # key-Schlüssel hier aus ~/..ssh/id_rsa.pub vom User:"devops"
-      key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXoxvBe7+KUSTgCVSvol4UEKknk9dfY5NYdF9+6PcXPa1BbFjxw4QsHVVlxdTFPmpRTVKcryaC+pl2J7V9oFm8b1REhGjGq7YFK5Uu99iLfQGL4sBFOfMoy4Xg3j1Qr6ZvZo645EPOYvV6BUCEMOFAky7r1OFbNO9QTBcJkfAni1kU8tOWPk/4jxD3qOHIJ3Mhibg8c3HUmq1/Czq6BcA/gzalbwzzlesmdJPCy3yqy2p1H1t34sBIZW6OjB9xE+m/hmtAmi7YvzD7lN3SFyzww3k/lIjcNBSkYnElr1mk3oX6ajyKlZ9HSkHHURttmHl8I+y0aksv87kdaHKvC72jm+asz4l13wL/QK3CZcMJglVm1TWcdeP5epvTuvNn7JgeouzAz4+H4GN4blwyzzUhtx+2xoJPMjxQpZypA6HBPc4vXdMZusYLfTj4LaFc08Jxc2zlgoh86s7QpnDtQCjxbQ5nwCpMByfzu5ngS5cGaLgguTA35QseRfh4GXEAwAoYteeg8/aCBX0t3//8VDxnqnmw2EcgQBiusC/OvlsHeteVVpfZVwTjBjTcImSNW9x359ZyfCEFABuPDSrns6YxOLqQQdce/gI279+6EoueC+2WcpafflhbBqum3EFHN3urL8W7j3nc+eWvt6fTDpMENlu9a/9SaLEFOKZBuEv8oQ== devops@workstation.local"
+- name: --- Roles workstation ---
+  hosts: workstation
+  roles:
+    - workstation
 
-
-
-# Add new play only in workstation
-- name: Install unzip and terraform in workstation.local
-  hosts: myself
-  gather_facts: yes
-  tasks:
-    
-  - name: install unzip
-    package:
-      name: unzip
-
-  - name: getting terraform link from website
-    unarchive:              # module that allows to unzip the zipped file
-      src: https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip
-      dest: /usr/local/bin
-      remote_src: yes       # the archive file already on remote system!
-      mode: 0755
-      owner: root
-      group: root
-
-
-
-
-
-# --------------------------------------------------------------------------------------
-- name: Install the Packages
+- name: --- Roles web_servers ---
   hosts: web_servers
-  tasks:
+  roles:
+    - web_servers
 
-  - name: Install apache2 and mod-php packages for Ubuntu/Debian
-    tags: apache,apache2,debian
-    apt:
-      name:
-        - apache2
-        - libapache2-mod-php
-      state: latest
-    when: ansible_distribution in ["Ubuntu", "Debian"]
-
-
-  - name: Install httpd and php packages for RHEL-Distribution
-    tags: apache,centos,httpd
-    dnf:
-      name:
-        - httpd
-        - php
-      state: latest
-    when: ansible_distribution == "AlmaLinux"
-      
-  - name: Enable and start httpd (RHEL and CentOS) because it doesnt start automatically
-    tags: apache,centos,httpd
-    service:
-      name: httpd
-      enabled: true
-      state: started
-    when: ansible_distribution == "AlmaLinux"
-
-  - name: change e-mail address for admin
-    tags: apache,centos,httpd
-    lineinfile:
-      path: /etc/httpd/conf/httpd.conf
-      regexp: '^ServerAdmin'
-      line: ServerAdmin my.email@somewhere.org
-    when: ansible_distribution == "AlmaLinux"
-    register: httpd                     # Name freiwählbar; hier: httpd als Variable
-
-  - name: restart Service only, when changed in httpd
-    tags: apache,centos,httpd
-    service:
-      name: httpd
-      state: restarted
-    when: httpd.changed                 # nur wenn in ..htttpd.conf geändert wurde
-
-  - name: copy default html file for website
-    tags: apache,apache2,httpd
-    copy:
-      src: default_site.html            # in /files/default_site.html
-      dest: /var/www/html/index.html
-      owner: root
-      group: root
-      mode: 0644
-
-- name: next Play No. 3
+- name: --- Roles db_servers ---
   hosts: db_servers
-  tasks:
-  
-  - name: Install mariadb package (RHEL)
-    tags: centos,db,mariadb
-    dnf:
-      name: mariadb
-      state: latest
-    when: ansible_distribution == "AlmaLinux"
+  roles:
+    - db_servers
 
-  - name: Install mariadb package (Debian) 
-    tags: db, mariadb,ubuntu
-    apt:
-      name: mariadb-server
-      state: latest
-    when: ansible_distribution == "Debian"
-
-
-- name: next Play No. 4
+- name: --- Roles file_servers ---
   hosts: file_servers
-  tasks:
-  
-  - name: Install samba package, same name for RHEL and Debian
-    tags: samba
-    package:          # Modul: package (samba has same name for RHEL + Debian)
-      name: samba
-      state: latest
+  roles:
+    - file_servers
 
