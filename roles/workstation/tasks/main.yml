@@ -1,0 +1,12 @@
+- name: install unzip
+  package:
+    name: unzip
+
+- name: getting terraform link from website
+  unarchive:              # module that allows to unzip the zipped file
+    src: https://releases.hashicorp.com/terraform/0.12.28/terraform_0.12.28_linux_amd64.zip
+    dest: /usr/local/bin
+    remote_src: yes       # the archive file already on remote system!
+    mode: 0755
+    owner: root
+    group: root

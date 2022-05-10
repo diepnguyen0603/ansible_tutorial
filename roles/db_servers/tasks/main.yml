@@ -1,0 +1,16 @@
+- name: Install mariadb package (RHEL)
+  tags: centos,db,mariadb
+  dnf:
+    name: mariadb
+    state: latest
+  when: ansible_distribution == "AlmaLinux"
+
+- name: Install mariadb package (Debian) 
+  tags: db, mariadb,ubuntu
+  apt:
+    name: mariadb-server
+    state: latest
+  when: ansible_distribution == "Debian"
+
+
+

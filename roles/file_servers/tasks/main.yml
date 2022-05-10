@@ -1,0 +1,5 @@
+- name: Install samba package, same name for RHEL and Debian
+  tags: samba
+  package:          # Modul: package (samba has same name for RHEL + Debian)
+    name: samba
+    state: latest
